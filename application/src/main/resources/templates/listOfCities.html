@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+  <head>
+  	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  	<title>All cities in the DB</title>
+    <link href="/styles.css" rel="stylesheet">
+    <link type="image/png" sizes="192x192" rel="icon" href="/favicon-192x192.png">
+    <link type="image/png" sizes="16x16" rel="icon" href="/favicon-16x16.png">
+    <link type="image/png" sizes="32x32" rel="icon" href="/favicon-32x32.png">
+    <link type="image/png" sizes="96x96" rel="icon" href="/favicon-96x96.png">
+  </head>
+  <body>
+    <div class="page" align="center">
+
+      <a href="/" class="styleOfBlock normalLink" style="display: block;">
+        <h2 class="zeroMarginTop zeroMarginBottom">Back</h2>
+      </a>
+
+
+      <div class="styleOfBlock">
+        <table>
+          <tr><th colspan="2">All cities in the DB</th></tr>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+          </tr>
+
+          <tr th:each="city : ${cities}">
+            <td th:text="${city.getId()}"></td>
+            <td th:text="${city.getName()}"></td>
+          </tr>
+
+        </table>
+      </div>
+
+
+
+    </div>
+  </body>
+</html>

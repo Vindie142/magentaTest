@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+  <head>
+  	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  	<title>Test task for Magenta Technology</title>
+    <link href="/styles.css" rel="stylesheet">
+    <link type="image/png" sizes="192x192" rel="icon" href="/favicon-192x192.png">
+    <link type="image/png" sizes="16x16" rel="icon" href="/favicon-16x16.png">
+    <link type="image/png" sizes="32x32" rel="icon" href="/favicon-32x32.png">
+    <link type="image/png" sizes="96x96" rel="icon" href="/favicon-96x96.png">
+  </head>
+  <body>
+    <div class="page" align="center">
+      <div class="styleOfBlock">
+        <h1>The distance calculator</h1>
+      </div>
+
+      <a href="/list-of-all-cities-in-the-db" class="styleOfBlock normalLink" style="display: block;">
+        <h2 class="zeroMarginTop zeroMarginBottom">• List of all cities in the DB •</h2>
+      </a>
+
+      <div class="styleOfBlock">
+        <h2 class="zeroMarginTop">•	Calculate distance •</h2>
+        <form class="" action="" method="post">
+
+          <div class="kard-grid">
+            <label class="kard standartInput">
+                <input name="calculationType" value="Crowflight" class="kard-radio" type="radio" required/>
+                <div class="plan-details">
+                  <div class="plan-type">Crowflight</div>
+                </div>
+            </label>
+            <label class="kard standartInput">
+                <input name="calculationType" value="Distance Matrix" class="kard-radio" type="radio" required/>
+                <div class="plan-details">
+                    <div class="plan-type">Distance Matrix</div>
+                </div>
+            </label>
+            <label class="kard standartInput">
+                <input name="calculationType" value="All" class="kard-radio" type="radio" required/>
+                <div class="plan-details">
+                    <div class="plan-type">All</div>
+                </div>
+            </label>
+          </div>
+
+          <input class="standartInput input" list="cities" name="fromCity" onchange="resetIfInvalid(this);" placeholder="From City" required>
+          <p style="margin: 10px auto; color: white;">↓↓↓</p>
+          <input class="standartInput input" list="cities" name="toCity" onchange="resetIfInvalid(this);" placeholder="To City" required>
+          <datalist id="cities">
+              <option class="formBase" th:each="city : ${cities}" th:value="${city.getId() + ': ' + city.getName()}"></option>
+          </datalist>
+          <input class="standartInput" style="font-size: 1.1em; display: block; padding: 10px;" type="submit" name="" value="Calculate">
+        </form>
+      </div>
+
+      <div class="styleOfBlock">
+        <h2 class="zeroMarginTop">•	Upload data to the DB •</h2>
+        <form class="" action="/upload-data-to-the-db" method="post" enctype="multipart/form-data">
+          <div class="standartInput" style="margin: 10px;">
+            <label for="xmlFile" style="display: inline-block;">a XML file:</label>
+            <input class="" style="display: inline-block; font-size: 1.1em; padding: 10px;" type="file" enctype="multipart/form-data" name="xmlFile" accept=".xml" required>
+          </div>
+          <input class="standartInput" style="font-size: 1.1em; display: block; padding: 10px;" type="submit" name="" value="Upload">
+        </form>
+        <p th:text="${infoUpload}"></p>
+      </div>
+
+
+      <br>
+    </div>
+    <script>
+      function resetIfInvalid(el){
+         //just for beeing sure that nothing is done if no value selected
+         if (el.value == "")
+             return;
+         var options = el.list.options;
+         for (var i = 0; i< options.length; i++) {
+             if (el.value == options[i].value)
+                 //option matches: work is done
+                 return;
+         }
+         //no match was found: reset the value
+         el.value = "";
+      }
+    </script>
+  </body>
+</html>

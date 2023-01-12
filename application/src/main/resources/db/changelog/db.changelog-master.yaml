@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-1.yaml
+  - changeSet:
+      id: 1
+      author: kv
+      changes:
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: decimal(10,6) 
+                  constraints:
+                    nullable: true
+              - column:
+                  name: longitude
+                  type: decimal(10,6)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 2
+      author: kv
+      changes:
+        - createTable:
+            tableName: distances
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    unique: true
+                    nullable: false
+              - column:
+                  name: distance
+                  type: decimal(38,2)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 3
+      author: kv
+      changes:
+        - addColumn:
+            tableName: distances
+            columns:
+              - column:
+                  name: from_city_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: distances
+            baseColumnNames: from_city_id
+            referencedTableName: cities
+            referencedColumnNames: id
+            constraintName: distances_from_city_id
+        - addColumn:
+            tableName: distances
+            columns:
+              - column:
+                  name: to_city_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: distances
+            baseColumnNames: to_city_id
+            referencedTableName: cities
+            referencedColumnNames: id
+            constraintName: distances_to_city_id
