@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,14 +19,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import ru.kazberov.magentaTest.repos.CityRepo;
 import ru.kazberov.magentaTest.services.Etc;
-import ru.kazberov.magentaTest.services.Etc.Deserializable;
-
-
+import ru.kazberov.magentaTest.services.XMLhelper.Deserializable;
 
 @Entity
 @Table(name="cities")
 public class City implements Comparable<City> {
-	
+
 	/**
 	 * the number of decimal places of latitude and longitude
 	 */
@@ -42,6 +42,7 @@ public class City implements Comparable<City> {
 	 * the value is stored in degrees
 	 * like 55,755831°
 	 */
+	@JsonIgnore
 	@Column(nullable = true)
 	private BigDecimal latitude; // shirota
 	/**
@@ -49,16 +50,22 @@ public class City implements Comparable<City> {
 	 * the value is stored in degrees
 	 * like 55,755831°
 	 */
+	@JsonIgnore
 	@Column(nullable = true)
 	private BigDecimal longitude; // dolgota
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="fromCity", fetch=FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
 	List<Distance> distances = new ArrayList<Distance>();
 	
 	
 	public City() {}
 	public City(String name) {
-		this.name = name;
+		this.name = name.trim();
+	}
+	public City(BigDecimal latitude, BigDecimal longitude) {
+		this.latitude = latitude == null ? latitude : latitude.setScale(NUMBER_OF_DECIMAL_OF_LAT_AND_LONG, RoundingMode.HALF_DOWN);
+		this.longitude = longitude == null ? longitude : longitude.setScale(NUMBER_OF_DECIMAL_OF_LAT_AND_LONG, RoundingMode.HALF_DOWN);
 	}
 	public City(String name, BigDecimal latitude, BigDecimal longitude) {
 		this(name);
@@ -66,14 +73,36 @@ public class City implements Comparable<City> {
 		this.longitude = longitude == null ? longitude : longitude.setScale(NUMBER_OF_DECIMAL_OF_LAT_AND_LONG, RoundingMode.HALF_DOWN);
 	}
 	
+	/**
+	 * checks latitude and longitude for entering acceptable ranges
+	 * latitude between −90° and +90°,
+	 * longitude between −180° and +180°
+	 * you can check only one by substituting null for the second value
+	 * if both are null it returns true 
+	 * @return true - correct, false - not correct
+	 */
+	public boolean ifCorrectLatAndLon(){
+		if (latitude != null) {
+			double latitudeD = latitude.doubleValue();
+			if (latitudeD < -90 || latitudeD > 90) {
+				return false;
+			}
+		}
+		if (longitude != null) {
+			double longitudeD = longitude.doubleValue();
+			if (longitudeD < -180 || longitudeD > 180) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	@Override
 	public String toString() {
-		String id = this.id == null ? "" : this.id.toString();
 		String name = this.name == null ? "" : this.name;
 		String latitude = this.latitude == null ? "" : this.latitude.toPlainString();
 		String longitude = this.longitude == null ? "" : this.longitude.toPlainString();
 		return  "City{"+
-				"id="+id+", "+
 				"name="+name+", "+
 				"latitude="+latitude+", "+
 				"longitude="+longitude+"}";
@@ -145,7 +174,7 @@ public class City implements Comparable<City> {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = name.trim();
 	}
 	
 	/**
@@ -213,8 +242,13 @@ public class City implements Comparable<City> {
 			City city = new City();
 			// city.setId(id);
 			city.setName(name);
-			city.setLatitude( new BigDecimal(Etc.standardizeLatOrLong(latitude)) );
-			city.setLongitude( new BigDecimal(Etc.standardizeLatOrLong(longitude)) );
+			try {
+				city.setLatitude( new BigDecimal(Etc.standardizeLatOrLong(latitude)) );
+				city.setLongitude( new BigDecimal(Etc.standardizeLatOrLong(longitude)) );
+			} catch (IllegalArgumentException e) {
+				// we ignore the exception,
+				// because we allow the possibility of entering incorrect data from the user
+			}
 			return city;
 		}
 	}

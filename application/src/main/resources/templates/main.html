@@ -22,7 +22,7 @@
 
       <div class="styleOfBlock">
         <h2 class="zeroMarginTop">•	Calculate distance •</h2>
-        <form class="" action="" method="post">
+        <form class="" action="/calculating" method="get">
 
           <div class="kard-grid">
             <label class="kard standartInput">
@@ -49,18 +49,19 @@
           <p style="margin: 10px auto; color: white;">↓↓↓</p>
           <input class="standartInput input" list="cities" name="toCity" onchange="resetIfInvalid(this);" placeholder="To City" required>
           <datalist id="cities">
-              <option class="formBase" th:each="city : ${cities}" th:value="${city.getId() + ': ' + city.getName()}"></option>
+              <option class="formBase" th:each="city : ${cities}" th:value="${city.getName()}"></option>
           </datalist>
           <input class="standartInput" style="font-size: 1.1em; display: block; padding: 10px;" type="submit" name="" value="Calculate">
         </form>
+        <p th:utext="${infoCalc}"></p>
       </div>
 
       <div class="styleOfBlock">
         <h2 class="zeroMarginTop">•	Upload data to the DB •</h2>
-        <form class="" action="/upload-data-to-the-db" method="post" enctype="multipart/form-data">
+        <form class="" action="/information-in-db" method="post" enctype="multipart/form-data">
           <div class="standartInput" style="margin: 10px;">
             <label for="xmlFile" style="display: inline-block;">a XML file:</label>
-            <input class="" style="display: inline-block; font-size: 1.1em; padding: 10px;" type="file" enctype="multipart/form-data" name="xmlFile" accept=".xml" required>
+            <input class="" style="display: inline-block; font-size: 1.1em; padding: 10px;" type="file" enctype="multipart/form-data" name="xml_file" accept=".xml" required>
           </div>
           <input class="standartInput" style="font-size: 1.1em; display: block; padding: 10px;" type="submit" name="" value="Upload">
         </form>

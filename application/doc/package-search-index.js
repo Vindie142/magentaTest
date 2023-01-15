@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"ru.kazberov.magentaTest"},{"l":"ru.kazberov.magentaTest.controllers"},{"l":"ru.kazberov.magentaTest.models"},{"l":"ru.kazberov.magentaTest.repos"},{"l":"ru.kazberov.magentaTest.services"}];updateSearchResults();

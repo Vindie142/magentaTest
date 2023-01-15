@@ -17,7 +17,9 @@
         <h2 class="zeroMarginTop zeroMarginBottom">Back</h2>
       </a>
 
-
+      <div class="styleOfBlock" th:if="${info != null}">
+        <p th:text="${info}"></p>
+      </div>
       <div class="styleOfBlock">
         <table>
           <tr><th colspan="2">All cities in the DB</th></tr>

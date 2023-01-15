@@ -1,21 +1,13 @@
 package ru.kazberov.magentaTest.services;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.json.JSONObject;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-
+import jakarta.servlet.http.HttpServletRequest;
 import ru.kazberov.magentaTest.models.City;
-import ru.kazberov.magentaTest.models.City.DeserializableCity;
-import ru.kazberov.magentaTest.models.Distance.DeserializableDistance;
-import ru.kazberov.magentaTest.repos.CityRepo;
+import ru.kazberov.magentaTest.models.Distance;
 
 public class Etc {
 	/**
@@ -29,6 +21,9 @@ public class Etc {
 	 * @throws IllegalArgumentException
 	 */
 	public static String standardizeLatOrLong(String input) throws IllegalArgumentException {
+		if (input == null || input.length() == 0) {
+			throw new IllegalArgumentException("Empty line");
+		}
 		input = input.replaceAll("(\\s|\\t|\\n|\\r|\\f)", "");
 		input = input.replaceAll(",", ".");
 		if ((input.matches("(.*)\\.(.*)\\.(.*)")) ) {
@@ -82,65 +77,59 @@ public class Etc {
 	 * @return "-" or ""
 	 */
 	private static String negOrPositVal(String input){
-		return input.contains("[//-SsWw]") ? "-" : "";
+		return input.contains("-") || input.matches("(.*)[SsWw](.*)") ? "-" : "";
 	}
 	
-	
-	
-	
-	
 	/**
-	 * returns a list of objects from an xml file
-	 * @param file
-	 * @return List<Deserializable>
-	 * @throws IOException, IllegalArgumentException
+	 * calculates the distance between two coordinates
+	 * @param lat1BD
+	 * @param lon1BD
+	 * @param lat2BD
+	 * @param lon2BD
+	 * @return
+	 * @throws IllegalArgumentException
+	 * @throws NullPointerException
 	 */
-	public static List<Deserializable> objectsFromXMLfile(MultipartFile file) throws IOException, IllegalArgumentException {
-		List<Deserializable> result = new ArrayList<Deserializable>();
+	public static BigDecimal calcDistanceBetweenTwoCoords(BigDecimal lat1BD, BigDecimal lon1BD,
+															BigDecimal lat2BD, BigDecimal lon2BD)
+															throws IllegalArgumentException, NullPointerException{
+		if (lat1BD == null || lon1BD == null || lat2BD == null || lon2BD == null) {
+			throw new NullPointerException("Еhere is not enough data in the data database");
+		}
+		if (!new City(lat1BD, lon1BD).ifCorrectLatAndLon() || !new City(lat2BD, lon2BD).ifCorrectLatAndLon()) {
+			throw new IllegalArgumentException("Latitude or longitude are in invalid ranges");
+		}
 		
-		InputStream in = file.getInputStream();
-		Scanner s = new Scanner(in).useDelimiter("\\A");
-        String content = s.hasNext() ? s.next() : "";
-        s.close();
-        
-        if (!content.contains("<")) {
-        	throw new IllegalArgumentException("The file's content does not look like XML content!");
-		}
-        
-        List<String> xmlStrings = new ArrayList<String>();
-        while (content.contains("<")) {
-        	int firstCharOfOpeningTag = content.indexOf("<");
-        	String openingTag = content.substring(firstCharOfOpeningTag+1, content.indexOf(">", firstCharOfOpeningTag+1));
-        	int lastCharOfClosingTag = content.indexOf("</"+openingTag+">") + openingTag.length()+3;
-        	xmlStrings.add( content.substring(firstCharOfOpeningTag, lastCharOfClosingTag) );
-        	
-        	if (lastCharOfClosingTag+1 >= content.length()) {
-				break;
-			}
-        	content = content.substring(lastCharOfClosingTag + 1);
-		}
-        
-        XmlMapper xmlMapper = new XmlMapper();
-        for (String string : xmlStrings) {
-        	Deserializable deserializable = null;
-        	if (string.contains("<City>")) {
-        		deserializable = xmlMapper.readValue(string, DeserializableCity.class);
-			} else if (string.contains("<Distance>")) {
-				deserializable = xmlMapper.readValue(string, DeserializableDistance.class);
-			} else {
-				continue;
-			}
-        	
-        	result.add(deserializable);
-		} 
-
-		return result;
+		double lat1 = lat1BD.doubleValue();
+		double lon1 = lon1BD.doubleValue();
+		double lat2 = lat2BD.doubleValue();
+		double lon2 = lon2BD.doubleValue();
+		
+		// double result = 6372.795 * Math.atan(Math.sqrt(Math.pow(Math.cos(lat2)*Math.sin(lon2-lon1), 2) + Math.pow( (Math.cos(lat1)*Math.sin(lat2)) - (Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1)), 2)) 
+		// 										/ ( (Math.sin(lat1)*Math.sin(lat2)) + (Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1)) ) );
+		double result = 6372.795 * 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(0.5*(lat2-lat1)), 2) + ( Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(0.5*(lon2-lon1)), 2) ) ));
+		// double result = 6372.795 * Math.acos(Math.sin(lat1)*Math.sin(lat2) + Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1 - lon2) );
+		// double result = 111.2 * Math.sqrt( (lon1 - lon2)*(lon1 - lon2) + (lat1 - lat2)*Math.cos(Math.PI*lon1/180)*(lat1 - lat2)*Math.cos(Math.PI*lon1/180));
+		return new BigDecimal(result).setScale(Distance.NUMBER_OF_DECIMAL_OF_DIST, RoundingMode.HALF_DOWN);
 	}
+	
 	/**
-	 * for Etc.objectsFromXMLfile()
+	 * finds the value by key by JSONObject
+	 * @param string
+	 * @param neededKey
+	 * @return String
 	 */
-	public interface Deserializable {
-		public Object toParentEntity(CityRepo cityRepo);
+	public static String valFormJSON(String string, String neededKey) {
+		JSONObject json = new JSONObject(string);
+		return String.valueOf( json.get(neededKey) );
+	}
+	
+	public static String domenFromRequest(HttpServletRequest sRequest) {
+		String fullDomen = sRequest.getHeader("referer").trim();
+		
+		int firstDomenIndex = fullDomen.indexOf("://") + "://".length();
+		int pastDomenIndex = fullDomen.indexOf('/', firstDomenIndex);
+		return fullDomen.substring(firstDomenIndex, pastDomenIndex);
 	}
 	
 }

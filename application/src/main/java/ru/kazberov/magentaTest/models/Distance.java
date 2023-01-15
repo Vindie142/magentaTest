@@ -2,7 +2,8 @@ package ru.kazberov.magentaTest.models;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
+import java.util.Comparator;
+import java.util.Random;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import ru.kazberov.magentaTest.repos.CityRepo;
-import ru.kazberov.magentaTest.services.Etc.Deserializable;
+import ru.kazberov.magentaTest.services.XMLhelper.Deserializable;
 
 
 
@@ -47,6 +48,34 @@ public class Distance implements Comparable<Distance> {
 		this.distance = distance == null ? distance : distance.setScale(NUMBER_OF_DECIMAL_OF_DIST, RoundingMode.HALF_DOWN);
 	}
 	
+	/**
+	 * returns an entity with the opposite direction
+	 * For example, it was from A to B, it became from B to A with the same distance
+	 * @return reversed Distance
+	 */
+	public Distance reverse() {
+		return new Distance(toCity, fromCity, distance);
+	}
+	
+	/**
+	 * checks distance > 0
+	 * if the distance == null it returns true 
+	 * @return true - correct, false - not correct
+	 */
+	public boolean ifCorrectDistance(){
+		if (distance != null && distance.compareTo(new BigDecimal("0")) <= 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static class DistanceComparatorByRandom implements Comparator<Distance> {
+		   @Override
+		   public int compare(Distance d1, Distance d2) {
+			   return 100 - new Random().nextInt(201);
+		   }
+	}
+	
 	@Override
 	public int compareTo(Distance a) {
 		return this.fromCity.compareTo(a.fromCity);
@@ -54,12 +83,10 @@ public class Distance implements Comparable<Distance> {
 	
 	@Override
 	public String toString() {
-		String id = this.id == null ? "" : this.id.toString();
 		String fromCity = this.fromCity == null ? "" : this.fromCity.getName();
 		String toCity = this.toCity == null ? "" : this.toCity.getName();
 		String distance = this.distance == null ? "" : this.distance.toPlainString();
 		return  "Distance{"+
-				"id="+id+", "+
 				"fromCity="+fromCity+", "+
 				"toCity="+toCity+", "+
 				"distance="+distance+"}";
@@ -144,27 +171,8 @@ public class Distance implements Comparable<Distance> {
 			Distance dist = new Distance();
 			// dist.setId(id);
 			dist.setDistance(distance);
-			
-			City fromCityObj = null;
-			Optional<City> optFromCity = cityRepo.findByName(fromCity);
-			if (optFromCity.isEmpty()) {
-				fromCityObj = new City(fromCity);
-				cityRepo.save(fromCityObj);
-			} else {
-				fromCityObj = optFromCity.get();
-			}
-			dist.setFromCity(fromCityObj);
-			
-			City toCityObj = null;
-			Optional<City> optToCity = cityRepo.findByName(toCity);
-			if (optToCity.isEmpty()) {
-				toCityObj = new City(toCity);
-				cityRepo.save(toCityObj);
-			} else {
-				toCityObj = optToCity.get();
-			}
-			dist.setToCity(toCityObj);
-			
+			dist.setFromCity(cityRepo.findByNameOrCreate(fromCity));
+			dist.setToCity(cityRepo.findByNameOrCreate(toCity));
 			return dist;
 		}
 	}

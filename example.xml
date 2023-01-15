@@ -1,0 +1,109 @@
+<City>
+    	<name>s1</name>
+	<latitude>75,755831°</latitude>
+	<longitude>-15,755831°</longitude>
+</City>
+
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s1</fromCity>
+	<toCity>s2</toCity>
+</Distance>
+<Distance>
+    	<distance>7</distance>
+	<fromCity>s2</fromCity>
+	<toCity>s3</toCity>
+</Distance>
+<Distance>
+    	<distance>9</distance>
+	<fromCity>s1</fromCity>
+	<toCity>s3</toCity>
+</Distance>
+<Distance>
+    	<distance>5</distance>
+	<fromCity>s1</fromCity>
+	<toCity>s4</toCity>
+</Distance>
+<Distance>
+    	<distance>2</distance>
+	<fromCity>s4</fromCity>
+	<toCity>s3</toCity>
+</Distance>
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s4</fromCity>
+	<toCity>s5</toCity>
+</Distance>
+<Distance>
+    	<distance>4</distance>
+	<fromCity>s4</fromCity>
+	<toCity>s6</toCity>
+</Distance>
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s1</fromCity>
+	<toCity>s6</toCity>
+</Distance>
+<Distance>
+    	<distance>2</distance>
+	<fromCity>s6</fromCity>
+	<toCity>s5</toCity>
+</Distance>
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s5</fromCity>
+	<toCity>s3</toCity>
+</Distance>
+
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s4</fromCity>
+	<toCity>s2</toCity>
+</Distance>
+<Distance>
+    	<distance>3</distance>
+	<fromCity>s2</fromCity>
+	<toCity>s1</toCity>
+</Distance>
+
+<Distance>
+    	<distance>3</distance>
+	<fromCity>s9</fromCity>
+	<toCity>s8</toCity>
+</Distance>
+<Distance>
+    	<distance>10</distance>
+	<fromCity>s8</fromCity>
+	<toCity>s10</toCity>
+</Distance>
+<Distance>
+    	<distance>4</distance>
+	<fromCity>s8</fromCity>
+	<toCity>s6</toCity>
+</Distance>
+<Distance>
+    	<distance>5</distance>
+	<fromCity>s8</fromCity>
+	<toCity>s1</toCity>
+</Distance>
+<Distance>
+    	<distance>2</distance>
+	<fromCity>s7</fromCity>
+	<toCity>s6</toCity>
+</Distance>
+<Distance>
+    	<distance>3</distance>
+	<fromCity>s7</fromCity>
+	<toCity>s1</toCity>
+</Distance>
+<Distance>
+    	<distance>1</distance>
+	<fromCity>s7</fromCity>
+	<toCity>s10</toCity>
+</Distance>
+
+<City>
+    	<name>s3</name>
+	<latitude>-55,755831°</latitude>
+	<longitude>55,755831°</longitude>
+</City>
